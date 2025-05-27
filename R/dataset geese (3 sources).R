@@ -50,10 +50,10 @@ liste_TDF=list(TDF_Carbon,TDF_Nitrogen)
 #blood cells
 
 Conso_bloodcell_Carbon=data.frame(Date=Dates,
-                                  Iso_C=c(-27.63,-26.33,-21.26,-20.07,-14.50,-14.02,-12.65,-12.54,-12.32),
+                                  Iso_C=c(-12.64,-14.53,-20.07,-13.99,-12.36,-21.28,-26.33,-27.56,-12.68),
                                   lambda=rep(lambda_bloodcell,9))
 Conso_bloodcell_Nitrogen=data.frame(Date=Dates,
-                                    Iso_C=c(8.09,8.84,9.18,10.47,10.28,9.54,8.48,9.04,10.26),
+                                    Iso_C=c(9.09,10.30,10.51,9.55,10.30,9.17,8.84,8.09,8.49),
                                     lambda=rep(lambda_bloodcell,9))
 liste_Conso_bloodcell=list(Conso_bloodcell_Carbon,Conso_bloodcell_Nitrogen)
 
@@ -70,30 +70,33 @@ liste_approx=list(Sources_C,Sources_N)
 # 
 liste_lambda=list(data.frame(Conso_bloodcell_Carbon$Date,Conso_bloodcell_Carbon$lambda),data.frame(Conso_bloodcell_Nitrogen$Date,Conso_bloodcell_Nitrogen$lambda))
 
-#------------fait tourner---------------
+#------------running the thre models---------------
 #fait tourner
 res=all_results(sources_list=liste_sources,data_feat=data_features(liste_sources),consu_list=liste_Conso_bloodcell
                 ,conc_list=liste_Conc,iter=iter,list_TEF=liste_TDF,X=50,sources_approx=liste_approx,lambda_list=liste_lambda)
 
-res_1=all_results(sources_list=liste_sources,data_feat=data_features(liste_sources),consu_list=liste_Conso_bloodcell
-                  ,conc_list=liste_Conc,iter=iter,list_TEF=liste_TDF,X=1,sources_approx=liste_approx,lambda_list=liste_lambda)
+# res_1=all_results(sources_list=liste_sources,data_feat=data_features(liste_sources),consu_list=liste_Conso_bloodcell
+#                   ,conc_list=liste_Conc,iter=iter,list_TEF=liste_TDF,X=1,sources_approx=liste_approx,lambda_list=liste_lambda)
 
-# write.csv2(res[[1]],file="SMM_50_ge3.csv")
+
+# write.csv2(res[[1]],file="SMM_all_sol_ge3.csv")
 # write.csv2(res[[2]],file="SMM_delta_50_ge3.csv")
-# write.csv2(res[[3]],file="DMM_50_ge3.csv")
+# write.csv2(res[[3]],file="DMM_all_sol_ge3.csv")
 SMM_50=read.csv2("SMM_50_ge3.csv")[-1]
 SMM_delta_50=read.csv2("SMM_delta_50_ge3.csv")[-1]
 DMM_50=read.csv2("DMM_50_ge3.csv")[-1]
-res_50=c(list(SMM_50),list(SMM_delta_50),list(DMM_50))
+res_50=c(res[[1]],res[[2]],res[[3]])
+
+# res_50=c(list(SMM_50),list(SMM_delta_50),list(DMM_50))
 
 # write.csv2(res_1[[1]],file="SMM_1_ge3.csv")
 # write.csv2(res_1[[2]],file="SMM_delta_1_ge3.csv")
 # write.csv2(res_1[[3]],file="DMM_1_ge3.csv")
-SMM_1=read.csv2("SMM_1_ge3.csv")[-1]
-SMM_delta_1=read.csv2("SMM_delta_1_ge3.csv")[-1]
-DMM_1=read.csv2("DMM_1_ge3.csv")[-1]
-res_1=c(list(SMM_1),list(SMM_delta_1),list(DMM_1))
-#------------GRAPHs---------------
+# SMM_1=read.csv2("SMM_1_ge3.csv")[-1]
+# SMM_delta_1=read.csv2("SMM_delta_1_ge3.csv")[-1]
+# DMM_1=read.csv2("DMM_1_ge3.csv")[-1]
+# res_1=c(list(SMM_1),list(SMM_delta_1),list(DMM_1))
+#------------GRAPHS_bloodcells---------------
 
 #biplot visuals
 sign_biplot(consu_list=liste_Conso_bloodcell,sources_list=liste_sources,list_TEF=liste_TDF
@@ -103,10 +106,10 @@ poly_sources_evol(consu_list=liste_Conso_bloodcell,sources_list=liste_sources,li
 
 
 #graphe_traj
-traj_graph(sources_list=liste_sources,sources_approx=liste_approx,consu_list=liste_Conso_bloodcell,iso_num=1
+traj_graph(sources_list=liste_sources,data_feat=data_features(liste_sources),sources_approx=liste_approx,consu_list=liste_Conso_bloodcell,iso_num=1
            ,lambda_list=liste_lambda,conc_list=liste_Conc,list_TEF=liste_TDF,iter=iter,X=50,time_range=c(0,730),range_y=c(-30,-8),title="C"
            ,y_label=expression(paste(" δ"^{13},"C (‰)")))
-traj_graph(sources_list=liste_sources,sources_approx=liste_approx,consu_list=liste_Conso_bloodcell,iso_num=2
+traj_graph(sources_list=liste_sources,data_feat=data_features(liste_sources),sources_approx=liste_approx,consu_list=liste_Conso_bloodcell,iso_num=2
            ,lambda_list=liste_lambda,conc_list=liste_Conc,list_TEF=liste_TDF,iter=iter,X=50,time_range=c(0,730),range_y=c(7,15),title="N"
            ,y_label=expression(paste(" δ"^{15},"N (‰)")))
 
@@ -124,76 +127,26 @@ dist_graph(obs_time=Dates,res_model=res_1,range_y=c(0,0.25))
 sources_contrib(mod_results = res_1,obs_time=Dates,title="Zoostera",source_num=1,"topleft")
 sources_contrib(mod_results = res_1,obs_time=Dates,title="Grass",source_num=2,"topleft")
 sources_contrib(mod_results = res_1,obs_time=Dates,title="Ulva",source_num=3,"topleft")
-sources_contrib(mod_results = res_1,obs_time=Dates,title="Entero",source_num=4,"topleft")
+# sources_contrib(mod_results = res_1,obs_time=Dates,title="Entero",source_num=4,"topleft")
 
 #contrib over time
-contrib_time(res_model=SMM_50,model_name="SMM",date=Dates,data_feat=data_features(liste_sources)
+contrib_time(res_model=res[[1]],model_name="SMM",date=Dates,data_feat=data_features(liste_sources)
              ,X=50,sources_name=c("Zos","grass","UlvaxEntero"),where_legend="topright")
 contrib_time(res_model=SMM_delta_50,model_name="SMM_delta",date=Dates,data_feat=data_features(liste_sources)
              ,X=50,sources_name=c("Zos","grass","UlvaxEntero"),where_legend="topright")
-contrib_time(res_model=DMM_50,model_name="DMM",date=Dates,data_feat=data_features(liste_sources)
+contrib_time(res_model=res[[3]],model_name="DMM",date=Dates,data_feat=data_features(liste_sources)
              ,X=50,sources_name=c("Zos","grass","UlvaxEntero"),where_legend="topright")
-#---------------------travail---------------------
-# SIMM_3iso<-function(deltaN,deltaC,sA_C,sB_C,sC_C,sA_N,sB_N,sC_N,TDF_AN,TDF_BN,TDF_CN,TDF_AC,TDF_BC,TDF_CC){
-#   pA<-(((sB_C+TDF_BC)-(sC_C+TDF_CC))*(deltaN-(sC_N+TDF_CN))-(deltaC-(sC_C+TDF_CC))*((sB_N+TDF_BN)-(sC_N+TDF_CN)))/(((sB_C+TDF_BC)-(sC_C+TDF_CC))*((sA_N+TDF_AN)-(sC_N+TDF_CN))+((sC_N+TDF_CN)-(sB_N+TDF_BN))*((sA_C+TDF_AC)-(sC_C+TDF_CC)))
-#   pB<-(deltaC-(sC_C+TDF_CC)-pA*((sA_C+TDF_AC)-(sC_C+TDF_CC)))/((sB_C+TDF_BC)-(sC_C+TDF_CC))
-#   pC<-1-pA-pB
-#   return(data.frame(pA=pA,pB=pB,pC=pC))
-# }
-# 
-# 
-# B=Choose_data(sources_list=liste_sources,consu_list=liste_Conso_plasma,conc_list=liste_Conc,iter=iter,obs_nb=4)
-# 
-# SMM_sol_exacte=SIMM_3iso(deltaN=B[[3]][[2]][[2]],deltaC=B[[3]][[1]][[2]],sA_C=B[[2]][[1]][[1]],sB_C=B[[2]][[1]][[2]],sC_C=B[[2]][[1]][[3]],sA_N=B[[2]][[2]][[1]],sB_N=B[[2]][[2]][[2]],sC_N=B[[2]][[2]][[3]],TDF_AN=3.54,TDF_BN=3.54,TDF_CN=3.54,TDF_AC=1.63,TDF_BC=1.63,TDF_CC=1.63)
-# 
-# A=Choose_data(sources_list=liste_sources,consu_list=liste_Conso_plasma,conc_list=liste_Conc,iter=iter,obs_nb=3)
-# DMM_sol_exacte=DMM_func(details_consu=A[[3]],details_consu_t1=A[[5]],sources_approx=liste_approx
-#                         ,list_TEF=liste_TDF,details_conc=A[[4]],Combi=SMM_sol_exacte,X=1,lambda_list=liste_lambda,data_feat=data_features(liste_sources))
-# DMM_tout=DMM_func(details_consu=A[[3]],details_consu_t1=A[[5]],sources_approx=liste_approx
-#                         ,list_TEF=liste_TDF,details_conc=A[[4]],Combi=A[[1]],X=2,lambda_list=liste_lambda,data_feat=data_features(liste_sources))
-#  Mel_C=data.frame(row.names=NULL)
-#  Mel_N=data.frame(row.names=NULL)
-# for (i in 1:nrow(A[[1]])) {
-#   Mel_C=rbind(Mel_C,Mixing(t=60,sources_approx=liste_approx[[1]],p=A[[1]][i,],TEF=liste_TDF[[1]],Conc=A[[4]][[1]]))
-#   Mel_N=rbind(Mel_N,Mixing(t=60,sources_approx=liste_approx[[2]],p=A[[1]][i,],TEF=liste_TDF[[2]],Conc=A[[4]][[2]]))}
-#  Melange=data.frame(Mel_C,Mel_N)
-# Mel_combi=cbind(Melange,A[[1]])
-# 
-# diff_C=diff_obs_pred(Mix=Mel_C,A[[3]][[1]][[2]])
-# diff_N=diff_obs_pred(Mix=Mel_N,A[[3]][[2]][[2]])
-# difference=cbind(diff_C,diff_N)
-# 
-# 
-# # Mel_C_sol_ex=data.frame(Mixing(t=A[[1]][[1]][[1]],sources_approx=liste_approx[[1]],p=SMM_sol_exacte,TEF=liste_TDF[[1]],Conc=A[[4]][[1]]))
-# # Mel_N_sol_ex=data.frame(Mixing(t=A[[1]][[1]][[1]],sources_approx=liste_approx[[2]],p=SMM_sol_exacte,TEF=liste_TDF[[2]],Conc=A[[4]][[2]]))
-# # 
-# # diff_C_sol_ex=diff_obs_pred(Mix=Mel_C_sol_ex,A[[3]][[1]][[2]])
-# # diff_N_sol_ex=diff_obs_pred(Mix=Mel_N_sol_ex,A[[3]][[2]][[2]])
-# # difference=cbind(diff_C_sol_ex,diff_N_sol_ex)
-# 
-# dist=distance(difference)
-# 
-# dist_combi=cbind(dist,A[[1]])
-# dist_ordered=dist_combi[order(dist_combi[[1]],decreasing = TRUE),]
-# sources_approx=liste_approx
-# num_iso=1
-# #dist_ordered[nrow(dist_ordered),-1]
-# traj=RUN_TIMdyn2(t=seq(123,396,1)
-#                  ,state0=c(X=A[[3]][[num_iso]][[2]]),
-#                  par=c(lambda = approxfun(liste_lambda[[num_iso]][[1]], liste_lambda[[num_iso]][[2]],method = 'const',rule=2), 
-#                        Xinf=approxfun(c(A[[3]][[num_iso]][[1]],A[[5]][[num_iso]][[1]]),
-#                                       Mixing(t=c(A[[3]][[num_iso]][[1]],A[[5]][[num_iso]][[1]]),
-#                                              sources_approx=sources_approx[[num_iso]],p=SMM_sol_exacte,TEF=liste_TDF[[num_iso]]
-#                                              ,Conc=A[[4]][[num_iso]]),rule=2)))[1:2]
-# 
-# 
-# plot(NULL,xlim=c(0,730),ylim=c(5,17),xlab="Time (d)",ylab="",main="title",cex.lab=1.3,las=1,cex.axis=1.1)
-# mtext("delta 15 N",side=2,line=4,padj=1.5,cex=1.3,font=2)
-# points(traj[[1]],traj[[2]])
-# points(396,10.47,col="red")
-# 
-# didi=sqrt(((A[[3]][[1]][[2]]+12.83938)/A[[3]][[1]][[2]]+(A[[3]][[2]][[2]]-8.726203)/A[[3]][[2]][[2]])^2)
-# 
+
+#------------GRAPHS_PLASMA---------------
+res=all_results(sources_list=liste_sources,data_feat=data_features(liste_sources),consu_list=liste_Conso_plasma
+                ,conc_list=liste_Conc,iter=iter,list_TEF=liste_TDF,X=50,sources_approx=liste_approx,lambda_list=liste_lambda)
+ridgeline_chart(res_model=res[[1]],model_name="SMM",sources_names=c("Zos","grass","UlvaxEntero"),X=50)
+ridgeline_chart(res_model=res[[3]],model_name="DMM",sources_names=c("Zos","grass","UlvaxEntero"),X=50)
+contrib_time(res_model=res[[1]],model_name="SMM",date=Dates,data_feat=data_features(liste_sources)
+             ,X=50,sources_name=c("Zos","grass","UlvaxEntero"),where_legend="topright")
+contrib_time(res_model=res[[3]],model_name="DMM",date=Dates,data_feat=data_features(liste_sources)
+             ,X=50,sources_name=c("Zos","grass","UlvaxEntero"),where_legend="topright")
+
 #------------BIAS ESTIMATION---------------
 bias_SMM=data.frame(row.names=NULL)
 for (i in 1:nrow(DMM_1)) {bias_SMM=rbind(bias_SMM,abs(DMM_1[i,3]+DMM_1[i,4]
@@ -204,74 +157,165 @@ bias_SMM=cbind(Time=DMM_1[[1]],bias_SMM,lambda_T)
 
 # plot(bias_SMM$lambda_T,bias_SMM$bias)
 
-#-----euclidian distance-----
-Sources_Carbon=data.frame(Date=Dates,
-                          Zos=rep(-11.17,9),
-                          Grass=rep(-30.88,9),
-                          Ulvaxentero=rep(-12.88,9))
-Sources_Nitrogen=data.frame(Date=Dates,
-                            Zos=rep(6.49,9),
-                            Grass=rep(4.43,9),
-                            Ulvaxentero=rep(10.5,9))
+#------------BIAS ESTIMATION---------------
+#We keep the 1% best solution 
+# SMM_50=read.csv2("SMM_50_ge3.csv")[-1]
+# DMM_50=read.csv2("DMM_50_ge3.csv")[-1]
+SMM_50=res[[1]]
+DMM_50=res[[3]]
 
-equ_val=data.frame(row.names=NULL)
-for (i in 1:nrow(DMM_1)){equ_val=rbind(equ_val,
-                                       cbind(
-                                         equ_C=(Sources_Carbon[1,2]*DMM_1[i,3]
-                                            +Sources_Carbon[1,3]*DMM_1[i,4]+
-                                                Sources_Carbon[1,4]*DMM_1[i,5]),
-                                       equ_N=(Sources_Nitrogen[1,2]*DMM_1[i,3]
-                                          +Sources_Nitrogen[1,3]*DMM_1[i,4]+
-                                            Sources_Nitrogen[1,4]*DMM_1[i,5])))}
+moments_DMM=unique(DMM_50$time)
 
-val_equ_vs_conso=cbind(equ_val,Conso_bloodcell_Carbon[-1,2],Conso_bloodcell_Nitrogen[-1,2])
-dist_euc=sqrt((val_equ_vs_conso$equ_C-val_equ_vs_conso$`Conso_bloodcell_Carbon[-1, 2]`)^2+(val_equ_vs_conso$equ_N-val_equ_vs_conso$`Conso_bloodcell_Nitrogen[-1, 2]`)^2)
-bias_SMM=cbind(bias_SMM,dist_euc)
+#first time for SMM
+t_1=subset(SMM_50,SMM_50$time==0)
+v1=quantile(t_1$Var1,probs = c(0.25,0.5,0.75))
+v2=quantile(t_1$Var2,probs = c(0.25,0.5,0.75))
+v3=quantile(t_1$Var3,probs = c(0.25,0.5,0.75))
+df_stats_SMM_0=data.frame(time=0,v1_Q1=v1[1],v1_M=v1[2],v1_Q3=v1[3],
+                      v2_Q1=v2[1],v2_M=v2[2],v2_Q3=v2[3],
+                      v3_Q1=v3[1],v3_M=v3[2],v3_Q3=v3[3])
 
-#setting colors +ordering col
-deg_col=viridis(n=20, alpha = 1, begin = 0, end = 1, direction = -1, option = "D")
-legend_image <- as.raster(matrix(rev(deg_col), ncol=1))
-ord_col=order(bias_SMM[,4])
-col_bias=NULL
-for (i in 1:nrow(bias_SMM)){col_bias=c(col_bias,round(bias_SMM[i,4]*11/20))}
-bias_SMM=cbind(bias_SMM,col_bias)
-###ordering data
-ord=order(bias_SMM$bias)
-ord_bias_SMM=bias_SMM[ord,]
-###graph
+#loop 
+df_stats_SMM_others=data.frame(row.names = F)
+df_stats_DMM=data.frame(row.names = F)
+for (i in 1:length(moments_DMM)){ #for every time
+  val=moments_DMM[i]
+  subs_SMM=subset(SMM_50,SMM_50$time==val)
+  subs_DMM=subset(DMM_50,time==val)
+  #SMM
+  sv1=quantile(subs_SMM$Var1,probs = c(0.25,0.5,0.75))
+  sv2=quantile(subs_SMM$Var2,probs = c(0.25,0.5,0.75))
+  sv3=quantile(subs_SMM$Var3,probs = c(0.25,0.5,0.75))
+  df_stats_SMM_others=rbind(df_stats_SMM_others
+                            ,data.frame(time=val
+                                        ,v1_Q1=sv1[1],v1_M=sv1[2],v1_Q3=sv1[3]
+                                        ,v2_Q1=sv2[1],v2_M=sv2[2],v2_Q3=sv2[3]
+                                        ,v3_Q1=sv3[1],v3_M=sv3[2],v3_Q3=sv3[3]))
+  #DMM
+  dv1=quantile(subs_DMM$Var1,probs = c(0.25,0.5,0.75))
+  dv2=quantile(subs_DMM$Var2,probs = c(0.25,0.5,0.75))
+  dv3=quantile(subs_DMM$Var3,probs = c(0.25,0.5,0.75))
+  df_stats_DMM=rbind(df_stats_DMM
+                            ,data.frame(time=val
+                                        ,v1_Q1=dv1[1],v1_M=dv1[2],v1_Q3=dv1[3]
+                                        ,v2_Q1=dv2[1],v2_M=dv2[2],v2_Q3=dv2[3]
+                                        ,v3_Q1=dv3[1],v3_M=dv3[2],v3_Q3=dv3[3]))
+}
+
+df_stats_SMM=rbind(df_stats_SMM_0,df_stats_SMM_others)
+
+#GRAPH DMM
+Q1_col=c(2,5,8)
+M_col=c(3,6,9)
+Q3_col=c(4,7,10)
+
+nb_sources=3
+color_main=c(rgb(0,0.45,0.7),rgb(0.83,0.36,0), #up to 7 sources
+             rgb(0,0.6,0.45),rgb(0.94,0.89,0.25)
+             ,rgb(0.8,0.47,0.65),rgb(0.9,0.6,0),
+             rgb(0.33,0.7,0.9))
+color_poly=c(rgb(0,0.45,0.7,0.2),rgb(0.83,0.36,0,0.2),rgb(0,0.6,0.45,0.2),rgb(0.94,0.89,0.25,0.2)
+             ,rgb(0.8,0.47,0.65,0.2),rgb(0.9,0.6,0,0.2),rgb(0.33,0.7,0.9,0.2) )
+#Graph DMM
 windows()
-par(mfrow=c(1,2))
-#legend
-plot(c(0,2),c(0,1),type = 'n', axes = F,xlab = '', ylab = '', main = 'Euclidian distance')
-# Tracer les graduations de la légende, ici le paramétrage en est strictement manuel 4 paliers entre 0 et 1
-text(x=1.5, y = seq(0,1,l=6), labels = seq(1,11,l=6))
-# Ajouter l'image de gradient
-rasterImage(legend_image, 0, 0, 1,1)
+par(xpd=TRUE, mar=c(8,4,4,3))
+plot(NULL,xlim=c(0,730),ylim=c(0,1),xlab="time(day)",ylab="",main="DMM",
+     , las=1, cex.lab=1.3,font=1)
+mtext("Contribution",side=2,line=4,padj=1.5,cex=1.3,font=1)
+for (i in 1:nb_sources) {
+  
+  polygon(x=c(df_stats_DMM$time,rev(df_stats_DMM$time))
+                                 ,y=c(df_stats_DMM[[Q3_col[i]]],rev(df_stats_DMM[[Q1_col[i]]]))
+                                 ,col=color_poly[i],border=NA)}
 
-plot(NA,NA,xlim=c(0,12),ylim=c(0,1),main="",xlab=c("λT"),ylab=c("Bias")
-     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4)
-points(ord_bias_SMM$lambda_T,ord_bias_SMM$bias,type="p",col=deg_col[ord_bias_SMM$col_bias],pch=16,cex=1.4)
-text(ord_bias_SMM$lambda_T+1.2,ord_bias_SMM$bias,labels = ord_bias_SMM$Time,font=2,cex=1)
+for (i in 1:nb_sources){
+  points(df_stats_DMM$time,df_stats_DMM[[M_col[i]]],type="l"
+                               ,col=color_main[i],
+                               pch=16,lwd=2)}
+legend("topright",legend=c("Zos","Grass","UlvaxEntero"),cex=1,col=c(color_main[1:nb_sources]),lty="solid",box.lty=0)
 
-##Big graph 
-# windows()
-# par(mfrow=c(2,2))
-#SMM
-ridgeline_chart(res_model=SMM_50,model_name="SMM",sources_names=c("Zos","grass","UlvaxEntero"),X=50)
+
+#GRAPH SMM
+windows()
+par(xpd=TRUE, mar=c(8,4,4,3))
+plot(NULL,xlim=c(0,730),ylim=c(0,1),xlab="time(day)",ylab="",main="SMM",
+     , las=1, cex.lab=1.3,font=1)
+mtext("Contribution",side=2,line=4,padj=1.5,cex=1.3,font=1)
+for (i in 1:nb_sources) {
+  
+  polygon(x=c(df_stats_SMM$time,rev(df_stats_SMM$time))
+          ,y=c(df_stats_SMM[[Q3_col[i]]],rev(df_stats_SMM[[Q1_col[i]]]))
+          ,col=color_poly[i],border=NA)}
+
+for (i in 1:nb_sources){
+  points(df_stats_SMM$time,df_stats_SMM[[M_col[i]]],type="l"
+         ,col=color_main[i],
+         pch=16,lwd=2)}
+# legend("topright",legend=c("Zos","Grass","UlvaxEntero"),cex=1,col=c(color_main[1:nb_sources]),lty="solid",box.lty=0)
+
+
+#BIAS
+Bias=data.frame(row.names = F)
+lambda_T <- c(3.285,1.107,9.750,1.071,1.107,1.107,2.107,6.535)
+for (i in 1:nrow(df_stats_DMM)){
+  B1=(abs(df_stats_DMM$v1_M[i]-df_stats_SMM_others$v1_M[i])+abs(df_stats_DMM$v2_M[i]-df_stats_SMM_others$v2_M[i])+abs(df_stats_DMM$v3_M[i]-df_stats_SMM_others$v3_M[i]))*50
+  Bias=rbind(Bias, data.frame(time=df_stats_DMM$time[i],lambda_T=lambda_T[i], B=B1))
+}
+
+
+plot(NULL,xlim=c(0,10),ylim=c(0,100),xlab="λT",ylab="β (%)"
+     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4,main="")
+points(Bias$lambda_T,Bias$B,type="p",pch=16)
+text(x=Bias$lambda_T+0.4,y=Bias$B+1,labels = Bias$time,cex=0.5,font=2,col="black")
+
+
+
+###
+
+dev.off()
 #DMM
-ridgeline_chart(res_model=DMM_50,model_name="DMM",sources_names=c("Zos","grass","UlvaxEntero"),X=50)
-#bias
-plot(NA,NA,xlim=c(0,10),ylim=c(0,1),main="",xlab=c("λT"),ylab=c("Bias")
-     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4)
-points(ord_bias_SMM$lambda_T,ord_bias_SMM$bias,type="p",col=ordered_colors,pch=16,cex=1.4)
-text(ord_bias_SMM$lambda_T+0.05,ord_bias_SMM$bias+0.01,labels = ord_bias_SMM$Time,font=2,cex=1)
-#legend
-plot(c(0,2),c(0,1),type = 'n', axes = F,xlab = '', ylab = '', main = 'Euclidian distance')
-# Tracer les graduations de la légende, ici le paramétrage en est strictement manuel 4 paliers entre 0 et 1
-text(x=1.5, y = seq(0,1,l=4), labels = seq(1,4.6,l=4))
-# Ajouter l'image de gradient
-rasterImage(legend_image, 0, 0, 1,1)
-# install.packages("ggpubr")
-library(ggpubr)
-figure <-ggarrange(g_1,g_2,labels=c("a","b"),ncol=2,nrow=1)
+par(fig=c(0,0.4,0,1), new=TRUE,mar = c(4, 3.5, 4.1, 0.2))
+plot(NULL,xlim=c(0,730),ylim=c(0,1),xlab="",ylab=""
+     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4,main="")
+mtext("Contribution",side=2,line=4,padj=1.9,cex=1.2,font=1)
+mtext("Time (d)",side=1,line=1,padj=1.5,at=10,cex=1.2,font=1)
+for (i in 1:nb_sources) {
+  
+  polygon(x=c(df_stats_DMM$time,rev(df_stats_DMM$time))
+          ,y=c(df_stats_DMM[[Q3_col[i]]],rev(df_stats_DMM[[Q1_col[i]]]))
+          ,col=color_poly[i],border=NA)}
 
+for (i in 1:nb_sources){
+  points(df_stats_DMM$time,df_stats_DMM[[M_col[i]]],type="l"
+         ,col=color_main[i],
+         pch=16,lwd=2)}
+# legend("topright",legend=c("Zos","Grass","UlvaxEntero"),cex=1,col=c(color_main[1:nb_sources]),lty="solid",box.lty=0)
+#SMM
+par(fig=c(0.4,0.8,0,1), new=TRUE,mar = c(4, 3.5, 4.1, 0.2))
+plot(NULL,xlim=c(0,730),ylim=c(0,1),xlab="",ylab=""
+     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4,main="")
+mtext("Contribution",side=2,line=4,padj=1.9,cex=1.2,font=1)
+mtext("Time (d)",side=1,line=1,padj=1.5,at=10,cex=1.2,font=1)
+for (i in 1:nb_sources) {
+  
+  polygon(x=c(df_stats_SMM$time,rev(df_stats_SMM$time))
+          ,y=c(df_stats_SMM[[Q3_col[i]]],rev(df_stats_SMM[[Q1_col[i]]]))
+          ,col=color_poly[i],border=NA)}
+
+for (i in 1:nb_sources){
+  points(df_stats_SMM$time,df_stats_SMM[[M_col[i]]],type="l"
+         ,col=color_main[i],
+         pch=16,lwd=2)}
+# legend("topright",legend=c("Zos","Grass","UlvaxEntero"),cex=1,col=c(color_main[1:nb_sources]),lty="solid",box.lty=0)
+#BIAS
+# par(fig=c(0.8,1,0,1), new=TRUE)
+plot(NULL,xlim=c(0,10),ylim=c(0,100),xlab="",ylab=""
+     , las=1, cex.lab=1.4,font.lab=2, cex.axis=1.4,main="")
+mtext("β (%)",side=2,line=4,padj=2.2,cex=1.2,font=1)
+mtext("λT",side=1,line=1,padj=1.5,at=5,cex=1.2,font=1)
+points(Bias$lambda_T,Bias$B,type="p",pch=16)
+text(x=Bias$lambda_T-0.2,y=Bias$B+3,labels = Bias$time,cex=0.5,font=2,col="black")
+
+
+plot(c(0,2),c(0,1),type = 'n', axes = F,xlab = '', ylab = '', main = '')
+legend("center",legend=c("Zos","Grass","UlvaxEntero","Sampling date"),cex=1,col=c(color_main[1:nb_sources],"black","black"),lty=c(1,1,1,NA),pch=c(NA,NA,NA,16),box.lty=0,lwd=2)
